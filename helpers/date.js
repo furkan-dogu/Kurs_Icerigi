@@ -4,3 +4,7 @@ export const getFormattedDate = (date) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
 }
+
+export const getLastWeek = (date, days) => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate() - days)
+}

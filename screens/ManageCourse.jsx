@@ -1,10 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useLayoutEffect } from "react";
 import { EvilIcons } from "@expo/vector-icons";
+import { useCoursesContext } from "../context/coursesContext";
 
 export default function ManageCourse({ route, navigation }) {
   const courseId = route.params?.courseId;
   let isEditing = false;
+  const { deleteCourse, updateCourse, addCourse } = useCoursesContext();
 
   if (courseId) {
     isEditing = true;
@@ -16,11 +18,29 @@ export default function ManageCourse({ route, navigation }) {
     });
   }, [navigation, isEditing]);
 
-  const deleteCourse = () => {
+  const handleDelete = () => {
+    deleteCourse(courseId);
     navigation.goBack();
   };
 
   const handleCancel = () => {
+    navigation.goBack();
+  };
+
+  const handleAddOrUpdate = () => {
+    if (isEditing) {
+      updateCourse(courseId, {
+        description: "Güncellenen Kurs",
+        amount: 169,
+        date: new Date(),
+      });
+    } else {
+      addCourse({
+        description: "Eklenen Kurs",
+        amount: 169,
+        date: new Date(),
+      });
+    }
     navigation.goBack();
   };
 
@@ -32,9 +52,11 @@ export default function ManageCourse({ route, navigation }) {
             <Text style={styles.buttonText}>İptal Et</Text>
           </View>
         </Pressable>
-        <Pressable>
+        <Pressable onPress={handleAddOrUpdate}>
           <View style={[styles.button, styles.addOrDelete]}>
-            <Text style={styles.buttonText}>{isEditing ? "Güncelle" : "Ekle"}</Text>
+            <Text style={styles.buttonText}>
+              {isEditing ? "Güncelle" : "Ekle"}
+            </Text>
           </View>
         </Pressable>
       </View>
@@ -45,7 +67,7 @@ export default function ManageCourse({ route, navigation }) {
             name="trash"
             size={36}
             color="black"
-            onPress={deleteCourse}
+            onPress={handleDelete}
           />
         </View>
       )}
@@ -68,15 +90,15 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 10
+    gap: 10,
   },
   button: {
     minWidth: 120,
     padding: 8,
-    alignItems: "center"
+    alignItems: "center",
   },
   buttonText: {
-    color: "white"
+    color: "white",
   },
   cancel: {
     backgroundColor: "red",
