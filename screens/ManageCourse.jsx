@@ -5,9 +5,11 @@ import { useCoursesContext } from "../context/coursesContext";
 import CourseForm from "../components/CourseForm";
 import { destroyedCourse, editCourse, storeCourse } from "../helpers/http";
 import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorText from "../components/ErrorText";
 
 export default function ManageCourse({ route, navigation }) {
   const [isSubmiting, setIsSubmiting] = useState(false)
+  const [error, setError] = useState(null)
   const courseId = route.params?.courseId;
   let isEditing = false;
   const { deleteCourse, updateCourse, addCourse, courses } = useCoursesContext();
@@ -26,9 +28,15 @@ export default function ManageCourse({ route, navigation }) {
 
   const handleDelete = async () => {
     setIsSubmiting(true)
-    deleteCourse(courseId);
-    await destroyedCourse(courseId);
-    navigation.goBack();
+    setError(null)
+    try {  
+      deleteCourse(courseId);
+      await destroyedCourse(courseId);
+      navigation.goBack();
+    } catch (error) {
+      setError("Kursları silemedik!")
+      setIsSubmiting(false)
+    }
   };
 
   const handleCancel = () => {
@@ -37,15 +45,25 @@ export default function ManageCourse({ route, navigation }) {
 
   const handleAddOrUpdate = async (courseData) => {
     setIsSubmiting(true)
-    if (isEditing) {
-      updateCourse(courseId, courseData);
-      await editCourse(courseId, courseData);
-    } else {
-      const id = await storeCourse(courseData)
-      addCourse({...courseData, id: id});
+    setError(null)
+    try {     
+      if (isEditing) {
+        updateCourse(courseId, courseData);
+        await editCourse(courseId, courseData);
+      } else {
+        const id = await storeCourse(courseData)
+        addCourse({...courseData, id: id});
+      }
+      navigation.goBack();
+    } catch (error) {
+      setError("Kurs eklemede veya güncellemede problem var!")
+      setIsSubmiting(false)
     }
-    navigation.goBack();
   };
+
+  if(error && !isSubmiting) {
+    return <ErrorText message={error} />
+  }
 
   if(isSubmiting) {
     return <LoadingSpinner />
