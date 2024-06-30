@@ -1,10 +1,13 @@
 import { StyleSheet, View } from "react-native";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 import { EvilIcons } from "@expo/vector-icons";
 import { useCoursesContext } from "../context/coursesContext";
 import CourseForm from "../components/CourseForm";
+import { destroyedCourse, editCourse, storeCourse } from "../helpers/http";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export default function ManageCourse({ route, navigation }) {
+  const [isSubmiting, setIsSubmiting] = useState(false)
   const courseId = route.params?.courseId;
   let isEditing = false;
   const { deleteCourse, updateCourse, addCourse, courses } = useCoursesContext();
@@ -21,8 +24,10 @@ export default function ManageCourse({ route, navigation }) {
     });
   }, [navigation, isEditing]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    setIsSubmiting(true)
     deleteCourse(courseId);
+    await destroyedCourse(courseId);
     navigation.goBack();
   };
 
@@ -30,14 +35,21 @@ export default function ManageCourse({ route, navigation }) {
     navigation.goBack();
   };
 
-  const handleAddOrUpdate = (courseData) => {
+  const handleAddOrUpdate = async (courseData) => {
+    setIsSubmiting(true)
     if (isEditing) {
       updateCourse(courseId, courseData);
+      await editCourse(courseId, courseData);
     } else {
-      addCourse(courseData);
+      const id = await storeCourse(courseData)
+      addCourse({...courseData, id: id});
     }
     navigation.goBack();
   };
+
+  if(isSubmiting) {
+    return <LoadingSpinner />
+  }
 
   return (
     <View style={styles.container}>

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View, Alert } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import Input from "./Input";
 import { getFormattedDate } from "../helpers/date";

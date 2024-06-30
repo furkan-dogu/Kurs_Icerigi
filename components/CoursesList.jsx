@@ -1,4 +1,4 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList } from "react-native";
 import React from "react";
 import CourseItem from "./CourseItem";
 
@@ -15,5 +15,3 @@ export default function CoursesList({ courses }) {
     />
   );
 }
-
-const styles = StyleSheet.create({});

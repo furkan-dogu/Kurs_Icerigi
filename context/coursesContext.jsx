@@ -1,18 +1,18 @@
 import { createContext, useContext, useReducer } from "react";
-import { COURSES } from "../helpers/courseItems";
 
 const CoursesContext = createContext()
 
 const coursesReducer = (state, action) => {
   switch (action.type) {
     case "ADD":
-      const id =
-        new Date().getTime().toString() +
-        Math.floor(Math.random() * 10).toString();
-      return [{ ...action.payload, id: id }, ...state];
+      return [action.payload, ...state];
 
     case "DELETE":
       return state.filter((course) => course.id !== action.payload);
+
+    case "SET":
+      const reversedData = action.payload.reverse()
+      return reversedData
 
     case "UPDATE":
       const updatedCourseIndex = state.findIndex(
@@ -30,7 +30,7 @@ const coursesReducer = (state, action) => {
 };
 
 const CoursesContextProvider = ({ children }) => {
-  const [coursesState, dispatch] = useReducer(coursesReducer, COURSES);
+  const [coursesState, dispatch] = useReducer(coursesReducer, []);
 
   const addCourse = (data) => {
     dispatch({ type: "ADD", payload: data });
@@ -38,6 +38,10 @@ const CoursesContextProvider = ({ children }) => {
 
   const deleteCourse = (id) => {
     dispatch({ type: "DELETE", payload: id });
+  };
+
+  const setCourse = (courses) => {
+    dispatch({ type: "SET", payload: courses });
   };
 
   const updateCourse = (id, data) => {
@@ -48,6 +52,7 @@ const CoursesContextProvider = ({ children }) => {
     courses: coursesState,
     addCourse,
     deleteCourse,
+    setCourse,
     updateCourse,
   };
 
