@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useLayoutEffect } from "react";
 import { EvilIcons } from "@expo/vector-icons";
 import { useCoursesContext } from "../context/coursesContext";
@@ -7,7 +7,9 @@ import CourseForm from "../components/CourseForm";
 export default function ManageCourse({ route, navigation }) {
   const courseId = route.params?.courseId;
   let isEditing = false;
-  const { deleteCourse, updateCourse, addCourse } = useCoursesContext();
+  const { deleteCourse, updateCourse, addCourse, courses } = useCoursesContext();
+
+  const selectedCourse = courses.find((course) => course.id === courseId)
 
   if (courseId) {
     isEditing = true;
@@ -28,41 +30,23 @@ export default function ManageCourse({ route, navigation }) {
     navigation.goBack();
   };
 
-  const handleAddOrUpdate = () => {
+  const handleAddOrUpdate = (courseData) => {
     if (isEditing) {
-      updateCourse(courseId, {
-        description: "Güncellenen Kurs",
-        amount: 169,
-        date: new Date(),
-      });
+      updateCourse(courseId, courseData);
     } else {
-      addCourse({
-        description: "Eklenen Kurs",
-        amount: 169,
-        date: new Date(),
-      });
+      addCourse(courseData);
     }
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      <CourseForm />
-      <View style={styles.buttons}>
-        <Pressable onPress={handleCancel}>
-          <View style={[styles.button, styles.cancel]}>
-            <Text style={styles.buttonText}>İptal Et</Text>
-          </View>
-        </Pressable>
-        <Pressable onPress={handleAddOrUpdate}>
-          <View style={[styles.button, styles.addOrDelete]}>
-            <Text style={styles.buttonText}>
-              {isEditing ? "Güncelle" : "Ekle"}
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-
+      <CourseForm
+        handleCancel={handleCancel}
+        onSubmit={handleAddOrUpdate}
+        buttonLabel={isEditing ? "Güncelle" : "Ekle"}
+        defaultValues={selectedCourse}
+      />
       {isEditing && (
         <View style={styles.deleteContainer}>
           <EvilIcons
@@ -88,24 +72,5 @@ const styles = StyleSheet.create({
     borderTopColor: "blue",
     paddingTop: 10,
     marginTop: 16,
-  },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 10,
-  },
-  button: {
-    minWidth: 120,
-    padding: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-  },
-  cancel: {
-    backgroundColor: "red",
-  },
-  addOrDelete: {
-    backgroundColor: "blue",
   },
 });
