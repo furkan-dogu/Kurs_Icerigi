@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useLayoutEffect } from "react";
 import { EvilIcons } from "@expo/vector-icons";
 import { useCoursesContext } from "../context/coursesContext";
+import CourseForm from "../components/CourseForm";
 
 export default function ManageCourse({ route, navigation }) {
   const courseId = route.params?.courseId;
@@ -46,6 +47,7 @@ export default function ManageCourse({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+      <CourseForm />
       <View style={styles.buttons}>
         <Pressable onPress={handleCancel}>
           <View style={[styles.button, styles.cancel]}>
